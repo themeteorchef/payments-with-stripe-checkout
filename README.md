@@ -5,7 +5,7 @@ In this recipe, we'll learn how to integrate payments using Stripe Checkout. We'
 
 [Read on The Meteor Chef](http://themeteorchef.com/recipes/payments-with-stripe-checkout)  
 
-[Demo the Recipe](http://tmc-017-demo.meteor.com)  
+[Demo the Recipe](http://tmc-017-demo.meteor.com/services)  
 
 [Download the Source](https://github.com/themeteorchef/payments-with-stripe-checkout/archive/master.zip)
 
