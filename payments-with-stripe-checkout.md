@@ -277,6 +277,10 @@ Template.services.onCreated( () => {
           Bert.alert( 'Thanks! You\'ll be ghost free soon :)', 'success' );
         }
       });
+    },
+    closed() {
+      template.processing.set( false );
+      template.paymentSucceeded.set( false );
     }
   });
 });
@@ -289,6 +293,8 @@ Inside of our `token()` method (the callback Stripe fires once it has successful
 This is because depending on whether the customer chooses to pay with a card or Bitcoin, Stripe sends us back differently shaped responses for the `token` value. To make sure that we support both—[Egon](https://tmc-post-content.s3.amazonaws.com/egon-spengler.png) was kind of a jerk about this whole Bitcoin thing—we need to account for the different response. To compensate for the missing values in the response from Stripe, notice that we just default back to the value stored on the object from our Reactive Var `selectedService`. Easy enough.
 
 Okay! Now we're getting to the important part: actually charging a customer. Even though Stripe is giving us back a token, we technically haven't charged the customer for anything yet. That will need to happen on the server. To get it working, here, we define a method call to `processPayment`, passing up our `charge` object we just defined. Notice that in our error and success callback below, we're triggering the appropriate Reactive Var's to reset our service list's state. Notice that if the payment is successful, we trigger our success message by setting `template.paymentSucceeeded` to `true`. Wow!
+
+Last but not least, notice that we've added another callback method `closed()` which Stripe fires when the payment window is closed. This ensures that if the customer decides to _not_ go forward with the payment, we reset our "processing" state accordingly with our Reactive Var's. Simple, but important so we don't frustrate the Ghostbuster's customers.
 
 That's it for the client! Let's hop up to the server and wrap this fella up. When we finish, we'll have a fully functioning check out system with both credit card _and_ Bitcoin payments. Rad.
 
