@@ -103,11 +103,7 @@ First up, we need to create a template. Fortunately our template is pretty simpl
 
         <p class="alert alert-warning">To demo, use any email address along with the card number <strong>4242 4242 4242 4242</strong>, any <em>future</em> expiration date, and any 3 digit security code (e.g 555)</p>
       {{else}}
-        {{#if paymentSucceeded}}
-          <p class="alert alert-success"><i class="fa fa-check"></i> Payment succeeded! We'll be in touch soon.</p>
-        {{else}}
-          <p class="alert alert-warning"><i class="fa fa-refresh fa-spin"></i> Processing payment...</p>
-        {{/if}}
+        <p class="alert alert-warning"><i class="fa fa-refresh fa-spin"></i> Processing payment...</p>
       {{/unless}}
     </div>
   </div>
@@ -116,12 +112,10 @@ First up, we need to create a template. Fortunately our template is pretty simpl
 
 Let's start at the top. First, notice that our list of services is wrapped in an `{{#unless}}` block pointing to a helper that we'll define later called `processing`. In a bit, we'll wire this up to a Reactive Var that we'll trigger whenever a customer clicks on the "Buy Now" button next to an item. When we do, we want to hide the services list and display a "Processing Payment..." message to acknowledge the user's action.
 
-If we look at the `{{else}}` portion of our `{{#unless}}` block, we'll see a similar pattern taking place. Instead of an `{{#unless}}` block, here we're using an `{{#if}}` block tied to _another_ helper that we'll define `paymentSucceeded`. The idea here is similar to the parent block: if the payment succeeds, we'll toggle a Reactive Var, revealing the "Payment Succeeded!" message. Making sense? 
-
 So it's clear, let's look at the JavaScript running our `{{#unless}}` and `{{#if}}` blocks here. From there, we'll start to build up our logic for the checkout.
 
 #### Wiring up our template
-First, let's focus on our Reactive Var's. What we need to do is define these and then create the helpers that they'll be wired up to. Again, these will simply be used for toggling state in our application via the `{{#unless processing}}` and `{{#if paymentSucceeded}}` blocks.
+First, let's focus on our Reactive Var. What we need to do is define these and then create the helpers that they'll be wired up to. Again, these will simply be used for toggling state in our application via the `{{#unless processing}}` block.
 
 <p class="block-header">/client/templates/public/services.js</p>
 
@@ -129,22 +123,18 @@ First, let's focus on our Reactive Var's. What we need to do is define these and
 Template.services.onCreated( () => {
   let template = Template.instance();
   
-  template.processing       = new ReactiveVar( false );
-  template.paymentSucceeded = new ReactiveVar( false );
+  template.processing = new ReactiveVar( false );
 });
 
 Template.services.helpers({
   processing() {
     return Template.instance().processing.get();
-  },
-  paymentSucceeded() {
-    return Template.instance().paymentSucceeded.get();
   }
 });
 ```
 This is all we need for now! We start by defining our Reactive Var's by using `new ReactiveVar()` in our template's `onCreated` method, assigning them to variables defined _on_ our template instance. Why? This ensures that our variables only exist for the lifecycle of the template. If we were to move to another page—effectively "destroying" the template—these values would cease to exist. Pretty wild, eh? We could do this just the same with something like Session variables, however, those will stick around (which we don't want).
 
-Toward the bottom, we're setting up our helpers: `processing` and `paymentSuceeded`. Both use the same technique to access the values: `Template.instance().<var name>.get()`. This is part of the Reactive Var API. As we'll see in a bit, the `.get()` method here has a counterpart called `.set()`. Again, this is all very similar to Session, however, it allows us to keep everything local to the template. Just note that right now all we're doing is pulling our values in and returning them from our helpers. Remember, these values are _reactive_, meaning, when we change them our helpers will reflect the change (toggling the state in our interface).
+Toward the bottom, we're setting up our helper `processing`. Here, we access the template instance and the our variable using `Template.instance().processing.get()`. This is part of the Reactive Var API. As we'll see in a bit, the `.get()` method here has a counterpart called `.set()`. Again, this is all very similar to Session, however, it allows us to keep everything local to the template. Just note that right now all we're doing is pulling our value in and returning it from our helper. Remember, this value is _reactive_, meaning, when we change it our helper will reflect the change (toggling the state in our interface).
 
 Now for the fun part! Next, we need to wire up Stripe Checkout. This involves two steps: configuring the checkout and a callback for handling the token Stripe will create for us and handling the opening of the checkout window.
 
@@ -188,7 +178,6 @@ Template.services.onCreated( () => {
 
   template.selectedService  = new ReactiveVar( false );
   template.processing       = new ReactiveVar( false );
-  template.paymentSucceeded = new ReactiveVar( false );
 
   template.checkout = StripeCheckout.configure(...);
 });
@@ -273,14 +262,12 @@ Template.services.onCreated( () => {
           template.processing.set( false );
           Bert.alert( error.reason, 'danger' );
         } else {
-          template.paymentSucceeded.set( true );
           Bert.alert( 'Thanks! You\'ll be ghost free soon :)', 'success' );
         }
       });
     },
     closed() {
       template.processing.set( false );
-      template.paymentSucceeded.set( false );
     }
   });
 });
@@ -292,9 +279,9 @@ Inside of our `token()` method (the callback Stripe fires once it has successful
 
 This is because depending on whether the customer chooses to pay with a card or Bitcoin, Stripe sends us back differently shaped responses for the `token` value. To make sure that we support both—[Egon](https://tmc-post-content.s3.amazonaws.com/egon-spengler.png) was kind of a jerk about this whole Bitcoin thing—we need to account for the different response. To compensate for the missing values in the response from Stripe, notice that we just default back to the value stored on the object from our Reactive Var `selectedService`. Easy enough.
 
-Okay! Now we're getting to the important part: actually charging a customer. Even though Stripe is giving us back a token, we technically haven't charged the customer for anything yet. That will need to happen on the server. To get it working, here, we define a method call to `processPayment`, passing up our `charge` object we just defined. Notice that in our error and success callback below, we're triggering the appropriate Reactive Var's to reset our service list's state. Notice that if the payment is successful, we trigger our success message by setting `template.paymentSucceeeded` to `true`. Wow!
+Okay! Now we're getting to the important part: actually charging a customer. Even though Stripe is giving us back a token, we technically haven't charged the customer for anything yet. That will need to happen on the server. To get it working, here, we define a method call to `processPayment`, passing up our `charge` object we just defined. Notice that in our error and success callback below, we're triggering the appropriate Reactive Var to reset our service list's state.
 
-Last but not least, notice that we've added another callback method `closed()` which Stripe fires when the payment window is closed. This ensures that if the customer decides to _not_ go forward with the payment, we reset our "processing" state accordingly with our Reactive Var's. Simple, but important so we don't frustrate the Ghostbuster's customers.
+Last but not least, notice that we've added another callback method `closed()` which Stripe fires when the payment window is closed. This ensures that if the customer decides to _not_ go forward with the payment (or the payment is successful), we reset our "processing" state accordingly with our Reactive Var. Simple, but important so we don't frustrate the Ghostbuster's customers.
 
 That's it for the client! Let's hop up to the server and wrap this fella up. When we finish, we'll have a fully functioning check out system with both credit card _and_ Bitcoin payments. Rad.
 
