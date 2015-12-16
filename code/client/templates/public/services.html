@@ -23,11 +23,7 @@
 
         <p class="alert alert-warning">To demo, use any email address along with the card number <strong>4242 4242 4242 4242</strong>, any <em>future</em> expiration date, and any 3 digit security code (e.g 555)</p>
       {{else}}
-        {{#if paymentSucceeded}}
-          <p class="alert alert-success"><i class="fa fa-check"></i> Payment succeeded! We'll be in touch soon.</p>
-        {{else}}
-          <p class="alert alert-warning"><i class="fa fa-refresh fa-spin"></i> Processing payment...</p>
-        {{/if}}
+        <p class="alert alert-warning"><i class="fa fa-refresh fa-spin"></i> Processing payment...</p>
       {{/unless}}
     </div>
   </div>

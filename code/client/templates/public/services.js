@@ -3,7 +3,6 @@ Template.services.onCreated( () => {
 
   template.selectedService  = new ReactiveVar( false );
   template.processing       = new ReactiveVar( false );
-  template.paymentSucceeded = new ReactiveVar( false );
 
   template.checkout = StripeCheckout.configure({
     key: Meteor.settings.public.stripe,
@@ -24,10 +23,12 @@ Template.services.onCreated( () => {
           template.processing.set( false );
           Bert.alert( error.reason, 'danger' );
         } else {
-          template.paymentSucceeded.set( true );
           Bert.alert( 'Thanks! You\'ll be ghost free soon :)', 'success' );
         }
       });
+    },
+    closed() {
+      template.processing.set( false );
     }
   });
 });
