@@ -1,17 +1,6 @@
 const authenticatedRoutes = FlowRouter.group({
-  name: 'authenticated'
+  name: 'authenticatedRoutes'
 });
 
-authenticatedRoutes.route( '/', {
-  name: 'index',
-  action() {
-    BlazeLayout.render( 'default', { yield: 'index' } );
-  }
-});
-
-authenticatedRoutes.route( '/dashboard', {
-  name: 'dashboard',
-  action() {
-    BlazeLayout.render( 'default', { yield: 'dashboard' } );
-  }
-});
+// This recipe doesn't call for any authenticated routes but you can add them
+// here if you need them :)

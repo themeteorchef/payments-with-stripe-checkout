@@ -1,0 +1,34 @@
+<template name="services">
+  <div class="row">
+    <div class="col-xs-12 col-md-6">
+      <img width="150" src="https://tmc-post-content.s3.amazonaws.com/ghostbusters-logo.png" alt="Ghostbusters">
+      <h4 class="page-header">We're ready to believe you!</h4>
+      {{# unless processing}}
+        <p class="alert alert-info">We offer the following paranormal elimination services:</p>
+
+        <ul class="list-group price-list">
+          <li class="list-group-item clearfix">
+            <p class="pull-left"><strong>$3,000</strong> &mdash; Full Torso Apparition Removal</p>
+            <a href="#" data-service="full-torso-apparition" class="btn btn-success pull-right">Buy Now</a>
+          </li>
+          <li class="list-group-item clearfix">
+            <p class="pull-left"><strong>$4,250</strong> &mdash; Free-Floating Repeater Removal</p>
+            <a href="#" data-service="free-floating-repeater" class="btn btn-success pull-right">Buy Now</a>
+          </li>
+          <li class="list-group-item clearfix">
+            <p class="pull-left"><strong>$5,000</strong> &mdash; Full Roaming Vapor Removal</p>
+            <a href="#" data-service="full-roaming-vapor" class="btn btn-success pull-right">Buy Now</a>
+          </li>
+        </ul>
+
+        <p class="alert alert-warning">To demo, use any email address along with the card number <strong>4242 4242 4242 4242</strong>, any <em>future</em> expiration date, and any 3 digit security code (e.g 555)</p>
+      {{else}}
+        {{#if paymentSucceeded}}
+          <p class="alert alert-success"><i class="fa fa-check"></i> Payment succeeded! We'll be in touch soon.</p>
+        {{else}}
+          <p class="alert alert-warning"><i class="fa fa-refresh fa-spin"></i> Processing payment...</p>
+        {{/if}}
+      {{/unless}}
+    </div>
+  </div>
+</template>

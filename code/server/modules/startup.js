@@ -6,7 +6,10 @@ let startup = () => {
 
 var _setEnvironmentVariables = () => Modules.server.setEnvironmentVariables();
 
-var _setBrowserPolicies = () => {};
+var _setBrowserPolicies = () => {
+	BrowserPolicy.content.allowOriginForAll( '*.amazonaws.com' );
+	BrowserPolicy.content.allowOriginForAll( '*.stripe.com' );
+};
 
 var _generateAccounts = () => Modules.server.generateAccounts();
 

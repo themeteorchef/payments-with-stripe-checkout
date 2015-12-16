@@ -1,8 +1,10 @@
 {
   "public": {
-    "key": "value"
+    "key": "value",
+		"stripe": "pk_test_59wytc8CX7ahqnMD58hWphSK"
   },
   "private": {
-    "MAIL_URL": ""
+    "MAIL_URL": "",
+		"stripe": "sk_test_v5nUu5maFMZ7hH65iQ5UTAca"
   }
 }
