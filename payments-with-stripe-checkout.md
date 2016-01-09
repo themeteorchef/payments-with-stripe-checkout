@@ -345,5 +345,3 @@ Somebody better let Slimer know he won't be hanging out in the city for long. Le
 
 ### Wrap up & summary
 In this recipe, we learned how to wire up Stripe's Checkout feature. We looked at configuring our API keys to work with Stripe securely, how to configure and fire an instance of Stripe checkout, and how to toggle state in our interface using Reactive Variables. To wrap up, we learned how to actually process a payment using Stripe's API and information we grabbed from the checkout window.
-
-
